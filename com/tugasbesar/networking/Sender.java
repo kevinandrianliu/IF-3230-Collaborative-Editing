@@ -4,7 +4,6 @@ import com.tugasbesar.classes.Character;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -13,21 +12,33 @@ import java.net.UnknownHostException;
 public class Sender {
   private MulticastSocket socket;
   private InetAddress ipAddressGroup;
+  private String ip;
   private int port;
 
   public Sender(String ip, int port){
     this.port = port;
+    this.ip = ip;
+  }
 
-    // Try connecting to socket and bind to multicast address
-    try {
-      socket = new MulticastSocket(port);
-      ipAddressGroup = InetAddress.getByName(ip);
-      socket.joinGroup(ipAddressGroup);
-    } catch (UnknownHostException e) {
-      System.out.println("ERROR IP address is unknown or invalid: " + e.getLocalizedMessage());
-    } catch (IOException e) {
-      System.out.println("ERROR Cannot create and/or bind socket: " + e.getLocalizedMessage());
+  public void StartConnection() {
+    if (socket != null){
+      System.out.println("ERROR Socket is already bounded. Unbound first.");
+    } else {
+      try {
+        socket = new MulticastSocket(port);
+        ipAddressGroup = InetAddress.getByName(ip);
+        socket.joinGroup(ipAddressGroup);
+      } catch (UnknownHostException e) {
+        System.out.println("ERROR IP address is unknown or invalid: " + e.getLocalizedMessage());
+      } catch (IOException e) {
+        System.out.println("ERROR Cannot create and/or bind socket: " + e.getLocalizedMessage());
+      }
     }
+  }
+
+  public void CloseConnection() {
+    socket.close();
+    socket = null;
   }
 
   public void SendMessage(Character character) {
