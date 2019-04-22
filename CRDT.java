@@ -1,34 +1,39 @@
 public class CRDT{
 	private int index;
 	private String text;
-	public getIndex() {
-		return index;
-	}
-	public getString() {
-		return text;
-	}
-	public setIndex(int mIndex) {
+	
+	public CRDT (int mIndex, String mText) {
 		index = mIndex;
-	}
-	public setString(String mText) {
 		text = mText;
 	}
-	public Insert1(char additional_char, int mIndex) {
-		String new_text = getString().substring(0, mIndex) + additional_char + getString().substring(mIndex);
+	public int getIndex() {
+		return index;
+	}
+	public String getString() {
+		return text;
+	}
+	public void setIndex(int mIndex) {
+		index = mIndex;
+	}
+	public void setString(String mText) {
+		text = mText;
+	}
+	public void Insert1(char additionalChar, int mIndex) {
+		String newText = text.substring(0, mIndex) + additionalChar + text.substring(mIndex);
+		setString(newText);
+	}
+	public void Insert2(char additionalChar, int mIndex) {
+		StringBuilder sb = new StringBuilder(text);
+		sb.insert(mIndex, additionalChar);
+		String newText = sb.toString();
+		setString(newText);
+	}
+	public void Delete1(int mIndex) {
+		String new_text = text.substring(0, mIndex) + text.substring(mIndex + 1);
 		setString(new_text);
 	}
-	public Insert2(char additional_char, int mIndex) {
-		StringBuilder sb = new StringBuilder(getString());
-		sb.insert(mIndex, additional_char);
-		String new_text = sb.toString();
-		setString(new_text);
-	}
-	public Delete1(int mIndex) {
-		String new_text = getString().substring(0, mIndex) + getString().substring(mIndex + 1);
-		setString(new_text);
-	}
-	public Delete2(int mIndex) {
-		StringBuilder sb = new StringBuilder(getString());
+	public void Delete2(int mIndex) {
+		StringBuilder sb = new StringBuilder(text);
 		sb.deleteCharAt(mIndex);
 		String new_text = sb.toString();
 		setString(new_text);
