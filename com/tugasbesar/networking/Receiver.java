@@ -64,12 +64,5 @@ public class Receiver {
     } catch (ClassNotFoundException e){
       System.out.println("ERROR Declared class does not exist.");
     }
-
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      //TODO: handle exception
-    }
-    
   }
 }

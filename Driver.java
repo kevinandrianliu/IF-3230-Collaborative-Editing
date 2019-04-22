@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 import com.tugasbesar.classes.Character;
 import com.tugasbesar.networking.Sender;
 import com.tugasbesar.networking.Receiver;
@@ -11,23 +13,44 @@ public class Driver {
     String ip = args[0];
     int port = Integer.parseInt(args[1]);
 
-    int[] position = {1, 2};
     SenderThread senderThread = new SenderThread(ip, port);
-    senderThread.CreateCharacter("A123", '%', position);
     ReceiverThread receiverThread = new ReceiverThread(ip, port);
 
-    if (args[2].equals("1")){
-      senderThread.CreateCharacter("A1", '%', position);
-    } else {
-      senderThread.CreateCharacter("X3", '$', position);
-    }
+    senderThread.start();
+    receiverThread.start();
 
-    senderThread.run();
-    receiverThread.run();
+    Scanner scanner = new Scanner(System.in);
+
+    while(true){
+      synchronized(senderThread){
+        System.out.print("Enter text: ");
+        String line = scanner.nextLine();
+        String[] words = line.split(" ");
+
+        if (words.length != 3){
+          System.out.println("Not enough param for character!");
+        } else {
+          String computerId = words[0];
+          char value = words[1].charAt(0);
+          int[] position = new int[2];
+          position[0] = Integer.parseInt((words[2].split(","))[0]);
+          position[1] = Integer.parseInt((words[2].split(","))[1]);
+          
+          senderThread.CreateCharacter(computerId, value, position);
+          senderThread.notify();
+
+          try {
+            senderThread.wait();
+          } catch (InterruptedException e) {
+            System.out.println("Sender thread interrupted on maint thread");
+          }
+        }
+      }
+    }
   }
 }
 
-class SenderThread implements Runnable {
+class SenderThread extends Thread {
   private String ip;
   private int port;
   private Sender sender;
@@ -47,25 +70,22 @@ class SenderThread implements Runnable {
   public void run() {
     sender.StartConnection();
 
-    if (character != null){
-      int i = 10;
-      while (i > 0){
-        sender.SendMessage(character);
-        i--;
-
+    while(true){
+      synchronized(this){
         try {
-          Thread.sleep(2000);
+          wait();
+          sender.SendMessage(character);
+          notify();
         } catch (InterruptedException e) {
-          System.out.println("Thread interrupted");
+          System.out.println("Thread sender interrupted on sender thread");
         }
       }
     }
-
-    sender.CloseConnection();
+    //sender.CloseConnection();
   }
 }
 
-class ReceiverThread implements Runnable {
+class ReceiverThread extends Thread {
   private String ip;
   private int port;
   private Receiver receiver;
