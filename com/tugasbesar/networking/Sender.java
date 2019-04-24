@@ -1,6 +1,6 @@
 package com.tugasbesar.networking;
 
-import com.tugasbesar.classes.Character;
+import com.tugasbesar.classes.CharacterData;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -41,7 +41,24 @@ public class Sender {
     socket = null;
   }
 
-  public void SendMessage(Character character) {
+  public void SendComputerId(String computerId){
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try {
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      oos.writeObject(computerId);
+    } catch (IOException e) {
+      System.out.println("ERROR Handling error in ObjectOutputStream: " + e.getLocalizedMessage());
+    }
+    byte[] data = baos.toByteArray();
+
+    try {
+      socket.send(new DatagramPacket(data, data.length, ipAddressGroup, port));
+    } catch (IOException e){
+      System.out.println("ERROR Cannot send data through socket: " + e.getLocalizedMessage());
+    }
+  }
+
+  public void SendMessage(CharacterData character) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -51,7 +68,6 @@ public class Sender {
     }
     byte[] data = baos.toByteArray();
 
-    System.out.println("[Sending object...]");
     try {
       socket.send(new DatagramPacket(data, data.length, ipAddressGroup, port));
     } catch (IOException e){

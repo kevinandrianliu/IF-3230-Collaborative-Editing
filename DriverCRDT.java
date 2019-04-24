@@ -1,5 +1,4 @@
 public class DriverCRDT {
-	public DriverCDRT(){}
 	public static void print(CRDT crdt) {
 		System.out.println(crdt.getIndex());
 		System.out.println(crdt.getString());
