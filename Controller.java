@@ -26,7 +26,7 @@ public class Controller {
 		String ip = args[0];
     int port = Integer.parseInt(args[1]);
     String computerId = UUID.randomUUID().toString().substring(0, 6);
-		ReceiverThread receiverThread = new ReceiverThread(ip, port, textArea);
+		ReceiverThread receiverThread = new ReceiverThread(ip, port, textArea, computerId);
 		SenderThread senderThread = new SenderThread(ip,port);
     senderThread.SetComputerId(computerId);
 
@@ -97,13 +97,13 @@ public class Controller {
 
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
           if (textArea.getCaretPosition() > 0){
-            //System.out.println("BKSP" + (textArea.getCaretPosition() - 1));
+            System.out.println("BKSP" + (textArea.getCaretPosition() - 1));
             position = textArea.getCaretPosition() - 1;
             order = "DELETE";
           }
         } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
           if (textArea.getCaretPosition() < textArea.getText().length()){
-          // System.out.println("DEL" + textArea.getCaretPosition());
+          System.out.println("DEL" + textArea.getCaretPosition());
           position = textArea.getCaretPosition();
           order = "DELETE";
           }
@@ -145,6 +145,8 @@ public class Controller {
                 } catch (InterruptedException ex) {
                   System.out.println("Sender thread interrupted on maint thread");
                 }
+              } else {
+                System.out.println("crdt is zero");
               }
             }
           }

@@ -11,6 +11,7 @@ public class ReceiverThread extends Thread {
   private String ip;
   private int port;
   private Receiver receiver;
+  private String computerId;
   private CRDT crdt;
   private LinkedList<VersionVector> versionVectorList;
   private LinkedList<CharacterData> deletionBuffer;
@@ -19,13 +20,14 @@ public class ReceiverThread extends Thread {
 
   public boolean isConnecting;
 
-  public ReceiverThread(String ip, int port, JTextArea textArea){
+  public ReceiverThread(String ip, int port, JTextArea textArea, String computerId){
     this.ip = ip;
     this.port = port;
     this.crdt = new CRDT();
     this.isConnecting = true;
     this.versionVectorList = new LinkedList<VersionVector>();
     this.textArea = textArea;
+    this.computerId = computerId;
 
     receiver = new Receiver(ip,port);
   }
@@ -56,15 +58,28 @@ public class ReceiverThread extends Thread {
       Object object = receiver.receiveMessage();
       if ((object) instanceof CharacterData){
         CharacterData character = (CharacterData) object;
-        System.out.println(character.getOrder());
-        System.out.println(character.toString());
-        if (character.getOrder().equals("INSERT")){
-          crdt.insert(character);
-          textArea.insert("" + character.getValue(), character.getPosition());
-        } else if (character.getOrder().equals("DELETE")){
-          System.out.println("POS ID: " + character.getPositionId());
-          crdt.remove(character.getPositionId());
-        }
+        
+        System.out.println("CRDT SIZE: " + crdt.getCharacterDataCRDT().size());
+          if (character.getOrder().equals("INSERT")){
+            System.out.println("y");
+            crdt.insert(character);
+
+            if (!(character.getComputerId().equals(computerId))){
+              textArea.insert("" + character.getValue(), character.getPosition());
+            }
+          } else if (character.getOrder().equals("DELETE")){
+            System.out.println("z");
+            crdt.remove(character.getPositionId());
+
+            if (!(character.getComputerId().equals(computerId))){
+              textArea.setText("");
+              int i = 0;
+              for (CharacterData characterData : crdt.getCharacterDataCRDT()){
+                textArea.insert("" + characterData.getValue(), i);
+                i++;
+              }
+            }
+          }
       }
     }
 

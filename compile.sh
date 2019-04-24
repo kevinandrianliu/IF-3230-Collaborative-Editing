@@ -7,3 +7,5 @@ javac ./com/tugasbesar/networking/Sender.java
 javac ./com/tugasbesar/networking/SenderThread.java
 
 javac ./Controller.java
+
+sleep 10
