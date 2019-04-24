@@ -1,43 +1,112 @@
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 class gui {
-    public static void main(String args[]) {
+  private int tes;
+  public static void main(String args[]) {
+    // Creating JFrame
+    JFrame frame = new JFrame("CRDT-based Text Editor");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(400, 400);
 
-        //Creating the Frame
-        JFrame frame = new JFrame("Text Editor by J2K");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
+    // Creating menu bar
+    JMenuBar menuBar = new JMenuBar();
+    JMenu menuBarFile = new JMenu("File");
+    JMenu menuBarHelp = new JMenu("Help");
+    menuBar.add(menuBarFile);
+    menuBar.add(menuBarHelp);
+    JMenuItem menuItemFileOpen = new JMenuItem("Open");
+    JMenuItem menuItemFileSaveAs = new JMenuItem("Save as");
+    menuBarFile.add(menuItemFileOpen);
+    menuBarFile.add(menuItemFileSaveAs);
 
-        //Creating the MenuBar and adding components
-        JMenuBar mb = new JMenuBar();
-        JMenu m1 = new JMenu("File");
-        JMenu m2 = new JMenu("Help");
-        mb.add(m1);
-        mb.add(m2);
-        JMenuItem m11 = new JMenuItem("Open");
-        JMenuItem m22 = new JMenuItem("Save as");
-        m1.add(m11);
-        m1.add(m22);
+    // Creating text area
+    JTextArea textArea = new JTextArea();
 
-        //Creating the panel at bottom and adding components
-        JPanel panel = new JPanel(); // the panel is not visible in output
-        JLabel label = new JLabel("Enter Text");
-        JTextField tf = new JTextField(10); // accepts upto 10 characters
-        JButton send = new JButton("Send");
-        JButton reset = new JButton("Reset");
-        panel.add(label); // Components Added using Flow Layout
-        panel.add(label); // Components Added using Flow Layout
-        panel.add(tf);
-        panel.add(send);
-        panel.add(reset);
+    // Add special case for backspace button
+    // InputMap inputMap = textArea.getInputMap(JComponent.WHEN_FOCUSED);
+    // ActionMap actionMap = textArea.getActionMap();
 
-        // Text Area at the Center
-        JTextArea ta = new JTextArea();
+    // String bkspKey = (String) inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
+    // Action originalBkspAction = actionMap.get(bkspKey);
+    
+    // Action newBkspAction = new BkspAction(originalBkspAction);
+    // actionMap.put(bkspKey, newBkspAction);
 
-        //Adding Components to the frame.
-        frame.getContentPane().add(BorderLayout.SOUTH, panel);
-        frame.getContentPane().add(BorderLayout.NORTH, mb);
-        frame.getContentPane().add(BorderLayout.CENTER, ta);
-        frame.setVisible(true);
-    }
+    textArea.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        handleEvent();
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        handleEvent();
+      }
+
+      private void handleEvent(){
+        System.out.println(textArea.getCaretPosition());
+      }
+    });
+    textArea.addKeyListener(new KeyListener(){
+    
+      @Override
+      public void keyTyped(KeyEvent e) {
+        
+      }
+    
+      @Override
+      public void keyReleased(KeyEvent e) {
+        
+      }
+    
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+          if (textArea.getCaretPosition() > 0){
+            System.out.println("BKSP" + (textArea.getCaretPosition() - 1));
+          }
+        } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
+          System.out.println("DEL" + textArea.getCaretPosition());
+        }
+      }
+    });
+
+    // Add text area scroll pane
+    JScrollPane textAreaScrollPane = new JScrollPane(textArea);
+
+    // Adding Components to the frame.
+    frame.getContentPane().add(BorderLayout.NORTH, menuBar);
+    frame.getContentPane().add(BorderLayout.CENTER, textAreaScrollPane);
+    frame.setVisible(true);
+  }
+
+  // private static class BkspAction extends AbstractAction {
+  //   private Action originalBkspAction;
+  //   public boolean isBackspacePressed;
+  
+  //   public BkspAction(Action originalBkspAction) {
+  //     this.originalBkspAction = originalBkspAction;
+  //     isBackspacePressed = false;
+  //   }
+  
+  //   @Override
+  //   public void actionPerformed(ActionEvent e) {
+  //     isBackspacePressed = true;
+  
+  //     if (originalBkspAction != null){
+  //       originalBkspAction.actionPerformed(e);
+  //     }
+  //   }
+  // }
 }
