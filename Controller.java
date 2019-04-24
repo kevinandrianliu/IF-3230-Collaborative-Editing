@@ -1,5 +1,6 @@
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.tugasbesar.networking.SenderThread;
 import com.tugasbesar.classes.CRDT;
@@ -17,11 +18,21 @@ public class Controller {
 		int port = Integer.parseInt(args[1]);
 		ReceiverThread receiverThread = new ReceiverThread(ip, port);
 		SenderThread senderThread = new SenderThread(ip,port);
+    senderThread.SetComputerId(UUID.randomUUID().toString().substring(0, 6));
 
-		senderThread.start();
-		receiverThread.start();
-		
+    senderThread.start();
+    receiverThread.start();
+    
+    // Broadcasting computer ID until user press enter
     Scanner scanner = new Scanner(System.in);
+    System.out.println("Broadcasting and receiving computer IDs in the area. Founded computer IDs will be listed below.");
+    System.out.println("Press Enter to stop and continue . . .");
+    scanner.nextLine();
+    senderThread.isConnecting = false;
+    receiverThread.isConnecting = false;
+
+    System.exit(0);
+    
     CRDT crdt = receiverThread.getCrdt();
 		while (true){
 			synchronized(senderThread){

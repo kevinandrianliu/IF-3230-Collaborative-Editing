@@ -42,6 +42,32 @@ public class Receiver {
     socket = null;
   }
 
+  public String receiveComputerId(){
+    // Receive object
+    System.out.println("[Receiving Object...]");
+    byte[] buffer = new byte[BUFFER_SIZE];
+    try {
+      socket.receive(new DatagramPacket(buffer, BUFFER_SIZE, ipAddressGroup, port));
+    } catch (Exception e) {
+      System.out.println("ERROR Cannot receive data: " + e.getLocalizedMessage());
+    }
+    
+    // Deserialize
+    ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+    String computerId = null;
+    try {
+      ObjectInputStream ois = new ObjectInputStream(bais);
+    
+      computerId = (String) ois.readObject();
+    } catch (IOException e) {
+      System.out.println("ERROR Cannot create ObjectInputStream or object is corrupted: " + e.getLocalizedMessage());
+    } catch (ClassNotFoundException e){
+      System.out.println("ERROR Declared class does not exist.");
+    }
+
+    return computerId;
+  }
+
   public CharacterData receiveMessage() {
     // Receive object
     System.out.println("[Receiving Object...]");

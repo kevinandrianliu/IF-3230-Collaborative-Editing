@@ -41,6 +41,24 @@ public class Sender {
     socket = null;
   }
 
+  public void SendComputerId(String computerId){
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try {
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      oos.writeObject(computerId);
+    } catch (IOException e) {
+      System.out.println("ERROR Handling error in ObjectOutputStream: " + e.getLocalizedMessage());
+    }
+    byte[] data = baos.toByteArray();
+
+    System.out.println("[Sending object...]");
+    try {
+      socket.send(new DatagramPacket(data, data.length, ipAddressGroup, port));
+    } catch (IOException e){
+      System.out.println("ERROR Cannot send data through socket: " + e.getLocalizedMessage());
+    }
+  }
+
   public void SendMessage(CharacterData character) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
