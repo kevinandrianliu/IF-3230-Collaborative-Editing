@@ -1,6 +1,12 @@
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import com.tugasbesar.networking.SenderThread;
 import com.tugasbesar.classes.CRDT;
@@ -12,13 +18,17 @@ public class Controller {
 		if (args.length != 2){
 			System.out.println("Usage: Controller <ip> <port>");
 			System.exit(1);
-		}
+    }
+    
+    // Creating text area
+    JTextArea textArea = new JTextArea();
 
 		String ip = args[0];
-		int port = Integer.parseInt(args[1]);
-		ReceiverThread receiverThread = new ReceiverThread(ip, port);
+    int port = Integer.parseInt(args[1]);
+    String computerId = UUID.randomUUID().toString().substring(0, 6);
+		ReceiverThread receiverThread = new ReceiverThread(ip, port, textArea);
 		SenderThread senderThread = new SenderThread(ip,port);
-    senderThread.SetComputerId(UUID.randomUUID().toString().substring(0, 6));
+    senderThread.SetComputerId(computerId);
 
     senderThread.start();
     receiverThread.start();
@@ -30,50 +40,124 @@ public class Controller {
     scanner.nextLine();
     senderThread.isConnecting = false;
     receiverThread.isConnecting = false;
-
-    System.exit(0);
     
-    CRDT crdt = receiverThread.getCrdt();
-		while (true){
-			synchronized(senderThread){
-        System.out.print("Enter text: ");
-        String line = scanner.nextLine();
-        String[] words = line.split(" ");
+    // Creating JFrame
+    JFrame frame = new JFrame("CRDT-based Text Editor");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(400, 400);
 
-        if (words.length != 4){
-          crdt = receiverThread.getCrdt();
-          crdt.printCrdt();
+    // Creating menu bar
+    JMenuBar menuBar = new JMenuBar();
+    JMenu menuBarFile = new JMenu("File");
+    JMenu menuBarHelp = new JMenu("Help");
+    menuBar.add(menuBarFile);
+    menuBar.add(menuBarHelp);
+    JMenuItem menuItemFileOpen = new JMenuItem("Open");
+    JMenuItem menuItemFileSaveAs = new JMenuItem("Save as");
+    menuBarFile.add(menuItemFileOpen);
+    menuBarFile.add(menuItemFileSaveAs);
+
+    textArea.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        handleEvent(e);
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        handleEvent(e);
+      }
+
+      private void handleEvent(DocumentEvent e){
+        //System.out.println(textArea.getCaretPosition());
+      }
+    });
+    textArea.addKeyListener(new KeyListener(){
+    
+      @Override
+      public void keyTyped(KeyEvent e) {
+        
+      }
+    
+      @Override
+      public void keyReleased(KeyEvent e) {
+        
+      }
+    
+      @Override
+      public void keyPressed(KeyEvent e) {
+        char value = e.getKeyChar();
+        int position = 0;
+        String order = null;
+
+        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+          if (textArea.getCaretPosition() > 0){
+            //System.out.println("BKSP" + (textArea.getCaretPosition() - 1));
+            position = textArea.getCaretPosition() - 1;
+            order = "DELETE";
+          }
+        } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
+          if (textArea.getCaretPosition() < textArea.getText().length()){
+          // System.out.println("DEL" + textArea.getCaretPosition());
+          position = textArea.getCaretPosition();
+          order = "DELETE";
+          }
+        } else if (
+          (e.getKeyCode() == KeyEvent.VK_UP) ||
+          (e.getKeyCode() == KeyEvent.VK_DOWN) ||
+          (e.getKeyCode() == KeyEvent.VK_LEFT) ||
+          (e.getKeyCode() == KeyEvent.VK_RIGHT)
+        ) {
+          // DO nothing
+        } else if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED){
+          e.consume();
         } else {
-          String computerId = words[0];
-          char value = words[1].charAt(0);
-          int position = Integer.parseInt(words[2]);
-          String order = words[3];
-          
-          if (order.equals("INSERT")){
-            senderThread.CreateCharacter(computerId, value, position, UUID.randomUUID().toString(), order);
-
-            senderThread.notify();
-            try {
-              senderThread.wait();
-            } catch (InterruptedException e) {
-              System.out.println("Sender thread interrupted on maint thread");
-            }
-          } else if (order.equals("DELETE")){
-            if (crdt.getCharacterDataCRDT().size() > 0){
-              System.out.println("YO");
-              CharacterData characterData = crdt.getCharacterData(position);
-              senderThread.CreateCharacter(computerId, '0', -1, characterData.getPositionId(), order);
-
+          // System.out.println(e.getKeyChar());
+          position = textArea.getCaretPosition();
+          order = "INSERT";
+        }
+        
+        if (order != null){
+          synchronized(senderThread){  
+            if (order.equals("INSERT")){
+              senderThread.CreateCharacter(computerId, value, position, UUID.randomUUID().toString(), order);
+  
               senderThread.notify();
               try {
                 senderThread.wait();
-              } catch (InterruptedException e) {
+              } catch (InterruptedException ex) {
                 System.out.println("Sender thread interrupted on maint thread");
+              }
+            } else if (order.equals("DELETE")){
+              CRDT crdt = receiverThread.getCrdt();
+              if (crdt.getCharacterDataCRDT().size() > 0){
+                CharacterData characterData = crdt.getCharacterData(position);
+                senderThread.CreateCharacter(computerId, '0', -1, characterData.getPositionId(), order);
+  
+                senderThread.notify();
+                try {
+                  senderThread.wait();
+                } catch (InterruptedException ex) {
+                  System.out.println("Sender thread interrupted on maint thread");
+                }
               }
             }
           }
         }
       }
-		}
+    });
+
+    // Add text area scroll pane
+    JScrollPane textAreaScrollPane = new JScrollPane(textArea);
+
+    // Adding Components to the frame.
+    frame.getContentPane().add(BorderLayout.NORTH, menuBar);
+    frame.getContentPane().add(BorderLayout.CENTER, textAreaScrollPane);
+    frame.setVisible(true);
 	}
 }

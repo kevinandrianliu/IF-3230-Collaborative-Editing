@@ -83,12 +83,14 @@ public class Receiver {
     CharacterData character = null;
     try {
       ObjectInputStream ois = new ObjectInputStream(bais);
-    
+      
       character = (CharacterData) ois.readObject();
     } catch (IOException e) {
       System.out.println("ERROR Cannot create ObjectInputStream or object is corrupted: " + e.getLocalizedMessage());
     } catch (ClassNotFoundException e){
       System.out.println("ERROR Declared class does not exist.");
+    } catch (ClassCastException e){
+      
     }
 
     return character;

@@ -5,6 +5,8 @@ import com.tugasbesar.classes.CharacterData;
 import com.tugasbesar.classes.VersionVector;
 import java.util.LinkedList;
 
+import javax.swing.JTextArea;
+
 public class ReceiverThread extends Thread {
   private String ip;
   private int port;
@@ -13,15 +15,17 @@ public class ReceiverThread extends Thread {
   private LinkedList<VersionVector> versionVectorList;
   private LinkedList<CharacterData> deletionBuffer;
   private LinkedList<CharacterData> insertionBuffer;
+  private JTextArea textArea;
 
   public boolean isConnecting;
 
-  public ReceiverThread(String ip, int port){
+  public ReceiverThread(String ip, int port, JTextArea textArea){
     this.ip = ip;
     this.port = port;
     this.crdt = new CRDT();
     this.isConnecting = true;
     this.versionVectorList = new LinkedList<VersionVector>();
+    this.textArea = textArea;
 
     receiver = new Receiver(ip,port);
   }
@@ -49,13 +53,18 @@ public class ReceiverThread extends Thread {
     }
 
     while (true){
-      CharacterData character = receiver.receiveMessage();
-      System.out.println(character.getOrder());
-      if (character.getOrder().equals("INSERT")){
-        crdt.insert(character);
-      } else if (character.getOrder().equals("DELETE")){
-        System.out.println("POS ID: " + character.getPositionId());
-        crdt.remove(character.getPositionId());
+      Object object = receiver.receiveMessage();
+      if ((object) instanceof CharacterData){
+        CharacterData character = (CharacterData) object;
+        System.out.println(character.getOrder());
+        System.out.println(character.toString());
+        if (character.getOrder().equals("INSERT")){
+          crdt.insert(character);
+          textArea.insert("" + character.getValue(), character.getPosition());
+        } else if (character.getOrder().equals("DELETE")){
+          System.out.println("POS ID: " + character.getPositionId());
+          crdt.remove(character.getPositionId());
+        }
       }
     }
 
