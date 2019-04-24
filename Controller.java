@@ -5,6 +5,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -26,25 +28,30 @@ public class Controller {
 		String ip = args[0];
     int port = Integer.parseInt(args[1]);
     String computerId = UUID.randomUUID().toString().substring(0, 6);
-		ReceiverThread receiverThread = new ReceiverThread(ip, port, textArea, computerId);
-		SenderThread senderThread = new SenderThread(ip,port);
-    senderThread.SetComputerId(computerId);
-
-    senderThread.start();
-    receiverThread.start();
     
     // Broadcasting computer ID until user press enter
-    Scanner scanner = new Scanner(System.in);
-    System.out.println("Broadcasting and receiving computer IDs in the area. Founded computer IDs will be listed below.");
-    System.out.println("Press Enter to stop and continue . . .");
-    scanner.nextLine();
-    senderThread.isConnecting = false;
-    receiverThread.isConnecting = false;
+    // Creating computer ID JFrame
+    JFrame computerIdFrame = new JFrame("Scanning for computers. . .");
+    computerIdFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    computerIdFrame.setSize(500, 300);
+    
+    JButton button = new JButton("Continue");
+    JTextArea tArea = new JTextArea();
+    tArea.setEditable(false);
+    tArea.insert("Your computer ID: " + computerId + "\n\n", 0);
+    tArea.insert("Scanned computer IDs: \n", tArea.getText().length());
+
+    ReceiverThread receiverThread = new ReceiverThread(ip, port, textArea, tArea, computerId);
+    SenderThread senderThread = new SenderThread(ip,port);
+    senderThread.SetComputerId(computerId);
+    
+    senderThread.start();
+    receiverThread.start();
     
     // Creating JFrame
     JFrame frame = new JFrame("CRDT-based Text Editor");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(400, 400);
+    frame.setSize(600, 600);
 
     // Creating menu bar
     JMenuBar menuBar = new JMenuBar();
@@ -74,7 +81,7 @@ public class Controller {
       }
 
       private void handleEvent(DocumentEvent e){
-        //System.out.println(textArea.getCaretPosition());
+
       }
     });
     textArea.addKeyListener(new KeyListener(){
@@ -97,13 +104,11 @@ public class Controller {
 
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
           if (textArea.getCaretPosition() > 0){
-            System.out.println("BKSP" + (textArea.getCaretPosition() - 1));
             position = textArea.getCaretPosition() - 1;
             order = "DELETE";
           }
         } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
           if (textArea.getCaretPosition() < textArea.getText().length()){
-          System.out.println("DEL" + textArea.getCaretPosition());
           position = textArea.getCaretPosition();
           order = "DELETE";
           }
@@ -117,7 +122,6 @@ public class Controller {
         } else if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED){
           e.consume();
         } else {
-          // System.out.println(e.getKeyChar());
           position = textArea.getCaretPosition();
           order = "INSERT";
         }
@@ -145,8 +149,6 @@ public class Controller {
                 } catch (InterruptedException ex) {
                   System.out.println("Sender thread interrupted on maint thread");
                 }
-              } else {
-                System.out.println("crdt is zero");
               }
             }
           }
@@ -160,6 +162,21 @@ public class Controller {
     // Adding Components to the frame.
     frame.getContentPane().add(BorderLayout.NORTH, menuBar);
     frame.getContentPane().add(BorderLayout.CENTER, textAreaScrollPane);
-    frame.setVisible(true);
+
+    button.addActionListener(new ActionListener(){
+    
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        computerIdFrame.dispose();
+        frame.setVisible(true);
+
+        senderThread.isConnecting = false;
+        receiverThread.isConnecting = false;
+      }
+    });
+    computerIdFrame.getContentPane().add(BorderLayout.CENTER, tArea);
+    computerIdFrame.getContentPane().add(BorderLayout.SOUTH, button);
+
+    computerIdFrame.setVisible(true);
 	}
 }

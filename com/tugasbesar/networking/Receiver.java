@@ -44,7 +44,6 @@ public class Receiver {
 
   public String receiveComputerId(){
     // Receive object
-    System.out.println("[Receiving Object...]");
     byte[] buffer = new byte[BUFFER_SIZE];
     try {
       socket.receive(new DatagramPacket(buffer, BUFFER_SIZE, ipAddressGroup, port));
@@ -70,7 +69,6 @@ public class Receiver {
 
   public CharacterData receiveMessage() {
     // Receive object
-    System.out.println("[Receiving Object...]");
     byte[] buffer = new byte[BUFFER_SIZE];
     try {
       socket.receive(new DatagramPacket(buffer, BUFFER_SIZE, ipAddressGroup, port));

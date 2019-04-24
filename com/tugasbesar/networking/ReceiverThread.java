@@ -17,16 +17,18 @@ public class ReceiverThread extends Thread {
   private LinkedList<CharacterData> deletionBuffer;
   private LinkedList<CharacterData> insertionBuffer;
   private JTextArea textArea;
+  private JTextArea tArea;
 
   public boolean isConnecting;
 
-  public ReceiverThread(String ip, int port, JTextArea textArea, String computerId){
+  public ReceiverThread(String ip, int port, JTextArea textArea, JTextArea tArea, String computerId){
     this.ip = ip;
     this.port = port;
     this.crdt = new CRDT();
     this.isConnecting = true;
     this.versionVectorList = new LinkedList<VersionVector>();
     this.textArea = textArea;
+    this.tArea = tArea;
     this.computerId = computerId;
 
     receiver = new Receiver(ip,port);
@@ -45,8 +47,8 @@ public class ReceiverThread extends Thread {
       }
 
       if (!(isAlreadyAvailable)){
+        tArea.insert(computerId + "\n", tArea.getText().length());
         versionVectorList.add(new VersionVector(computerId, 0));
-        System.out.println(computerId);
       }
 
       if (!isConnecting) {
@@ -59,16 +61,13 @@ public class ReceiverThread extends Thread {
       if ((object) instanceof CharacterData){
         CharacterData character = (CharacterData) object;
         
-        System.out.println("CRDT SIZE: " + crdt.getCharacterDataCRDT().size());
           if (character.getOrder().equals("INSERT")){
-            System.out.println("y");
             crdt.insert(character);
 
             if (!(character.getComputerId().equals(computerId))){
               textArea.insert("" + character.getValue(), character.getPosition());
             }
           } else if (character.getOrder().equals("DELETE")){
-            System.out.println("z");
             crdt.remove(character.getPositionId());
 
             if (!(character.getComputerId().equals(computerId))){

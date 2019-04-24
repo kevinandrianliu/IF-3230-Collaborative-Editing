@@ -51,7 +51,6 @@ public class Sender {
     }
     byte[] data = baos.toByteArray();
 
-    System.out.println("[Sending object...]");
     try {
       socket.send(new DatagramPacket(data, data.length, ipAddressGroup, port));
     } catch (IOException e){
@@ -69,7 +68,6 @@ public class Sender {
     }
     byte[] data = baos.toByteArray();
 
-    System.out.println("[Sending object...]");
     try {
       socket.send(new DatagramPacket(data, data.length, ipAddressGroup, port));
     } catch (IOException e){
