@@ -1,6 +1,6 @@
 package com.tugasbesar.networking;
 
-import com.tugasbesar.classes.Character;
+import com.tugasbesar.classes.CharacterData;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -41,7 +41,7 @@ public class Sender {
     socket = null;
   }
 
-  public void SendMessage(Character character) {
+  public void SendMessage(CharacterData character) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       ObjectOutputStream oos = new ObjectOutputStream(baos);

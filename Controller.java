@@ -1,64 +1,68 @@
-public class Controller implements Runnable{
-	private int[] deletionBuffer;
-	private Thread thread;
-	private int id_thread;
-	private CRDT collaboration_text;
-	
-	Controller(int threadid, int[] buff, CRDT collab_text){
-		id_thread = threadid;
-		for (int buffElement: buff)
-		{
-		    deletionBuffer.append(buffElement);
+import java.util.Scanner;
+import java.util.UUID;
+
+import com.tugasbesar.networking.SenderThread;
+import com.tugasbesar.classes.CRDT;
+import com.tugasbesar.classes.CharacterData;
+import com.tugasbesar.networking.ReceiverThread;
+
+public class Controller {
+	public static void main (String[] args){
+		if (args.length != 2){
+			System.out.println("Usage: Controller <ip> <port>");
+			System.exit(1);
 		}
-		collaboration_text = collab_text;
-	}
-	
-	public void getCRDT() {
-		return collaboration_text;
-	}
-	
-	public void getDeletionBuffer() {
-		return deletionBuffer;
-	}
-	
-	public void setCRDT(CRDT collab_text) {
-		collaboration_text = collab_text;
-	}
-	
-	public void setDeletionBuffer(int[] buff) {
-		for (int buffElement: buff)
-		{
-		    deletionBuffer.append(buffElement);
-		}
-	}
-	
-	public void run() {
-		System.out.println("Running " +  threadName );
-		try {
-			for(int i = 4; i > 0; i--) {
-				System.out.println("Thread: " + threadName + ", " + i);
-				// Let the thread sleep for a while.
-				Thread.sleep(50);
-			}
-		} catch (InterruptedException e) {
-			System.out.println("Thread " +  threadName + " interrupted.");
-		}
-		System.out.println("Thread " +  threadName + " exiting.");
-	}
-	   
-	public void start () {
-		if (thread == null) {
-			thread = new Thread (this, threadName);
-			thread.start ();
-		}
-	}
+
+		String ip = args[0];
+		int port = Integer.parseInt(args[1]);
+		ReceiverThread receiverThread = new ReceiverThread(ip, port);
+		SenderThread senderThread = new SenderThread(ip,port);
+
+		senderThread.start();
+		receiverThread.start();
 		
-	public insertCRDT(int node, char add_char, int index) {
-		if(thread_id == node) {
-			collaboration_text.getString().Insert1(add_char, index);
+    Scanner scanner = new Scanner(System.in);
+    CRDT crdt = receiverThread.getCrdt();
+		while (true){
+			synchronized(senderThread){
+        System.out.print("Enter text: ");
+        String line = scanner.nextLine();
+        String[] words = line.split(" ");
+
+        if (words.length != 4){
+          crdt = receiverThread.getCrdt();
+          crdt.printCrdt();
+        } else {
+          String computerId = words[0];
+          char value = words[1].charAt(0);
+          int position = Integer.parseInt(words[2]);
+          String order = words[3];
+          
+          if (order.equals("INSERT")){
+            senderThread.CreateCharacter(computerId, value, position, UUID.randomUUID().toString(), order);
+
+            senderThread.notify();
+            try {
+              senderThread.wait();
+            } catch (InterruptedException e) {
+              System.out.println("Sender thread interrupted on maint thread");
+            }
+          } else if (order.equals("DELETE")){
+            if (crdt.getCharacterDataCRDT().size() > 0){
+              System.out.println("YO");
+              CharacterData characterData = crdt.getCharacterData(position);
+              senderThread.CreateCharacter(computerId, '0', -1, characterData.getPositionId(), order);
+
+              senderThread.notify();
+              try {
+                senderThread.wait();
+              } catch (InterruptedException e) {
+                System.out.println("Sender thread interrupted on maint thread");
+              }
+            }
+          }
+        }
+      }
 		}
-	}
-	public insertCRDT(int node, char add_char, int index, CRDT collaboration_text) {
-		collaboration_text.getString().Insert1(add_char, index);
 	}
 }

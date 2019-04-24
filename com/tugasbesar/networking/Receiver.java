@@ -1,6 +1,6 @@
 package com.tugasbesar.networking;
 
-import com.tugasbesar.classes.Character;
+import com.tugasbesar.classes.CharacterData;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -42,7 +42,7 @@ public class Receiver {
     socket = null;
   }
 
-  public void receiveMessage() {
+  public CharacterData receiveMessage() {
     // Receive object
     System.out.println("[Receiving Object...]");
     byte[] buffer = new byte[BUFFER_SIZE];
@@ -54,15 +54,17 @@ public class Receiver {
     
     // Deserialize
     ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+    CharacterData character = null;
     try {
       ObjectInputStream ois = new ObjectInputStream(bais);
     
-      Character character = (Character) ois.readObject();
-      System.out.println(character.toString());
+      character = (CharacterData) ois.readObject();
     } catch (IOException e) {
       System.out.println("ERROR Cannot create ObjectInputStream or object is corrupted: " + e.getLocalizedMessage());
     } catch (ClassNotFoundException e){
       System.out.println("ERROR Declared class does not exist.");
     }
+
+    return character;
   }
 }
