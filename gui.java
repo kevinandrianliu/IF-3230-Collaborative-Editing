@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 class gui {
     public static void main(String args[]) {
@@ -21,18 +23,28 @@ class gui {
 
         //Creating the panel at bottom and adding components
         JPanel panel = new JPanel(); // the panel is not visible in output
-        JLabel label = new JLabel("Enter Text");
-        JTextField tf = new JTextField(10); // accepts upto 10 characters
-        JButton send = new JButton("Send");
-        JButton reset = new JButton("Reset");
-        panel.add(label); // Components Added using Flow Layout
-        panel.add(label); // Components Added using Flow Layout
-        panel.add(tf);
-        panel.add(send);
-        panel.add(reset);
-
+        
         // Text Area at the Center
         JTextArea ta = new JTextArea();
+        ta.getDocument().addDocumentListener(new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            System.out.println(ta.getCaretPosition());
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            System.out.println(ta.getCaretPosition());
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            System.out.println(ta.getCaretPosition());
+        }
+        });
+
+        // Add Scroll Pane
+        JScrollPane sp = new JScrollPane(ta);
 
         //Adding Components to the frame.
         frame.getContentPane().add(BorderLayout.SOUTH, panel);
