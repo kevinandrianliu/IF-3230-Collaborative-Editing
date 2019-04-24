@@ -3,11 +3,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 class gui {
-  private int tes;
   public static void main(String args[]) {
     // Creating JFrame
     JFrame frame = new JFrame("CRDT-based Text Editor");
@@ -41,7 +39,7 @@ class gui {
     textArea.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        handleEvent();
+        handleEvent(e);
       }
 
       @Override
@@ -51,11 +49,11 @@ class gui {
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        handleEvent();
+        handleEvent(e);
       }
 
-      private void handleEvent(){
-        System.out.println(textArea.getCaretPosition());
+      private void handleEvent(DocumentEvent e){
+        //System.out.println(textArea.getCaretPosition());
       }
     });
     textArea.addKeyListener(new KeyListener(){
@@ -78,6 +76,10 @@ class gui {
           }
         } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
           System.out.println("DEL" + textArea.getCaretPosition());
+        } else if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED){
+          e.consume();
+        } else {
+          System.out.println(e.getKeyChar());
         }
       }
     });
