@@ -35,7 +35,7 @@ Menurut kami, sistem peer-to-peer membuat program kami menjadi tidak intuitif. K
 ### Kasus Uji
 1. 2 komputer, dengan komputer 1 menulis kata "CAT". Hasil : komputer 2 tertampil "CAT" juga.  
 2. Setelah langkah 1, komputer 2 menggerakkan kursor ke paling kiri mendelete pada posisi 0(atau C) sehingga pada komputer kedua tertampil "AT", dan akhirnya pada komputer pertama juga tertampil "AT".  
-3. Setelah langkah 2, komputer 1 menambah enter sehingga menjadi "AT<enter>". Hasil : komputer 2 tertampil "AT<enter>" juga.  
+3. Setelah langkah 2, komputer 1 menambah enter sehingga menjadi "AT[enter]". Hasil : komputer 2 tertampil "AT[enter]" juga.  
 4. Setelah langkah 3, komputer 2 memencet backspace. Hasil : komputer 1 dan 2 tertampil "AT".  
 ### Screenshoot
 
