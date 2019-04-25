@@ -1,7 +1,8 @@
 # CDRT
 ## Petunjuk Penggunaan Program
 Program di-compile dengan format sebagai berikut : `./compile.sh` untuk Linux. Jika menggunakan Windows, harus meng-install Cygwin atau Git Bash, lalu compile dengan `.\compile.sh`.  
-Program di-execute dengan format sebagai berikut : `java Controller <ip> <port>` 
+Program di-execute dengan format sebagai berikut : `java Controller <ip> <port>`
+Catatan : Port yang digunakan harus multicast (lebih dari *224.0.0.0*), dan portnya adalah UDP. 
 
 ## Pembagian Tugas
 13516058 : GUI dan laporan  
@@ -37,7 +38,10 @@ Menurut kami, sistem peer-to-peer membuat program kami menjadi tidak intuitif. K
 2. Setelah langkah 1, komputer 2 menggerakkan kursor ke paling kiri mendelete pada posisi 0(atau C) sehingga pada komputer kedua tertampil "AT", dan akhirnya pada komputer pertama juga tertampil "AT".  
 3. Setelah langkah 2, komputer 1 menambah enter sehingga menjadi "AT[enter]". Hasil : komputer 2 tertampil "AT[enter]" juga.  
 4. Setelah langkah 3, komputer 2 memencet backspace. Hasil : komputer 1 dan 2 tertampil "AT".  
-### Screenshoot
+### Screenshot
 
+![connect](/img/Capture.PNG)
+![connect](/img/Cat.PNG)
+![connect](/img/At.PNG)
 
 
