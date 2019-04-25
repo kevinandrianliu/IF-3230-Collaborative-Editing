@@ -1,6 +1,6 @@
 # CDRT
 ## Petunjuk Penggunaan Program
-Program di-compile dengan format sebagai berikut : `./compile.sh` untuk Linux. Jika menggunakan Windows, harus meng-install Cygwin atau Git Bash, lalu compile dengan '.\compile.sh'
+Program di-compile dengan format sebagai berikut : `./compile.sh` untuk Linux. Jika menggunakan Windows, harus meng-install Cygwin atau Git Bash, lalu compile dengan `.\compile.sh`.  
 Program di-execute dengan format sebagai berikut : `java Controller.java <ip> <port>` 
 
 ## Pembagian Tugas
@@ -22,15 +22,15 @@ CRDT merupakan model class yang bertujuan untuk mengatur memasukkan/menghapus ka
   private String positionId;  
   private String order;`  
 dan CRDT yang berisi LinkedList dari CharacterData.  
+  
 Version Vector merupakan model class yang bertujuan untuk mengetahui versi dari sebuah komputer Id tertentu saat mendapatkan message dari komputerId lainnya bahwa ada update yang terjadi. Komputer yang menerima message dapat membandingkan version vector yang dikirimkan oleh komputer lain dengan version vector miliknya. Jika lebih kecil, akan diupdate(algoritma tidak perlu mengecek jika lebih besar karena tidak terjadi). Struktur datanya adalah sebagai berikut:  
  `private String computerId;  
  private int counter;`  
+  
 Deletion Buffer akan menjadi tempat penyimpanan sementara untuk operasi yang melakukan delete, agar ketika ada operasi yang melakukan insert di sebuah komputer dan dilanjutkan dengan delete pada indeks yang sama di komputer lainnya tetapi yang sampai pada sebuah komputer adalah kebalikan dari proses tersebut(karena delay akibat koneksi internet) dapat dikembalikan urutannya seperti sediakala, sehingga menjamin konsistensi hasil data dari ketiganya. Struktur datanya adalah LinkedList dari CharacterData.  
-
+  
 ### Analisis
-Menurut kami, sistem peer-to-peer membuat progam kami menjadi tidak intuitif. Kami harus mengakali kelemahan dalam InitialConnection dengan memaksa semua komputer harus terhubung terlebih dahulu, baru dapat melakukan collaborative editing. Lalu, kami tidak mengimplementasikan kemungkinan jika ada dua atau lebih operasi yang dilakukan pada komputer yan berbeda pada teks yang sama secara konkuren, sehingga ada kemungkinan gagal.
-
-Seharusnya kami mengimplementasikannnya dengan sistem client-server agar server dapat mengatur operasi yang dilakukan oleh setiap client agar dapat konsisten.
+Menurut kami, sistem peer-to-peer membuat progam kami menjadi tidak intuitif. Kami harus mengakali kelemahan dalam InitialConnection dengan memaksa semua komputer harus terhubung terlebih dahulu, baru dapat melakukan collaborative editing. Lalu, kami tidak mengimplementasikan kemungkinan jika ada dua atau lebih operasi yang dilakukan pada komputer yan berbeda pada teks yang sama secara konkuren, sehingga ada kemungkinan gagal. Seharusnya kami mengimplementasikannnya dengan sistem client-server agar server dapat mengatur operasi yang dilakukan oleh setiap client agar dapat konsisten.
 
 ### Kasus Uji
 
