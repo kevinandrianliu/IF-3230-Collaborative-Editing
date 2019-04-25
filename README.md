@@ -43,5 +43,5 @@ Menurut kami, sistem peer-to-peer membuat program kami menjadi tidak intuitif. K
 ![connect](/img/Capture.PNG)
 ![connect](/img/Cat.PNG)
 ![connect](/img/At.PNG)
-
+![connect](/img/Ate.PNG)
 
